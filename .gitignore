@@ -1,0 +1,6 @@
+.venv/
+__pycache__/
+*.pyc
+.env
+credentials/
+tickets_enrichis.xlsx

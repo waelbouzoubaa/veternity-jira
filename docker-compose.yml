@@ -1,0 +1,14 @@
+services:
+  rag-dashboard-jira-veternity:
+    build: .
+    container_name: rag-dashboard-jira-veternity
+    restart: unless-stopped
+    environment:
+      - DATA_SOURCE=google_sheets
+      - GOOGLE_SHEETS_CREDENTIALS_PATH=/app/credentials/ai-portal-bq-analytics-key.json
+      - GOOGLE_SHEETS_SPREADSHEET_ID=${GOOGLE_SHEETS_SPREADSHEET_ID}
+      - GOOGLE_SHEETS_TAB_NAME=${GOOGLE_SHEETS_TAB_NAME}
+    volumes:
+      - ./credentials:/app/credentials:ro
+    ports:
+      - "8501:8501"
