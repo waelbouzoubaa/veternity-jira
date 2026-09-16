@@ -1,4 +1,7 @@
+import html
 import os
+import re
+
 import pandas as pd
 import streamlit as st
 
@@ -57,6 +60,17 @@ def parse_score(value) -> float:
         return float(s)
     except ValueError:
         return 0.0
+
+
+def strip_formatting(text: str) -> str:
+    """Le résumé RAG contient des balises <br> et du **gras** markdown (format imposé
+    par le prompt du RAG Confluence) — on les retire pour un aperçu en texte propre,
+    tronquable sans risque de couper une balise en plein milieu."""
+    text = re.sub(r"<br\s*/?>", " ", text, flags=re.IGNORECASE)
+    text = re.sub(r"<[^>]+>", "", text)
+    text = re.sub(r"\*\*(.*?)\*\*", r"\1", text)
+    text = re.sub(r"\s+", " ", text).strip()
+    return html.escape(text)
 
 
 def score_badge(score: float) -> str:
@@ -226,15 +240,16 @@ for _, row in page_df.iterrows():
 
         st.markdown("<div style='margin-top:14px;'></div>", unsafe_allow_html=True)
 
-        resume = str(row.get("Résumé RAG") or "—")
+        resume_raw = str(row.get("Résumé RAG") or "—")
+        resume_preview = strip_formatting(resume_raw)
         st.markdown(
-            f"<div style='color:#3f3f3e;'>{resume[:PREVIEW_LEN].rstrip()}"
-            f"{'…' if len(resume) > PREVIEW_LEN else ''}</div>",
+            f"<div style='color:#3f3f3e;'>{resume_preview[:PREVIEW_LEN].rstrip()}"
+            f"{'…' if len(resume_preview) > PREVIEW_LEN else ''}</div>",
             unsafe_allow_html=True,
         )
-        if len(resume) > PREVIEW_LEN:
+        if len(resume_preview) > PREVIEW_LEN:
             with st.expander("Voir le résumé complet"):
-                st.write(resume)
+                st.markdown(resume_raw, unsafe_allow_html=True)
 
         ressources = str(row.get("Ressources trouvées") or "")
         if ressources and ressources != "Aucune ressource pertinente trouvée":

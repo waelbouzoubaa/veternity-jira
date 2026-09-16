@@ -10,8 +10,11 @@ rows = [
         "IC-101", "https://veternity.atlassian.net/browse/IC-101",
         "Impossible de se connecter au module facturation", "En cours",
         "2026-09-14T09:12:00Z", "2026-09-14T09:15:00Z",
-        "La documentation explique la procédure de réinitialisation du mot de passe "
-        "et les prérequis réseau pour accéder au module.",
+        "**Procédure de réinitialisation**<br>"
+        "1. Aller dans les paramètres du module<br>"
+        "2. Cliquer sur \"Réinitialiser le mot de passe\"<br><br>"
+        "**Prérequis réseau**<br>"
+        "Le VPN doit être actif avant la connexion. " * 8,
         "Procédure de connexion module facturation — https://confluence.veternity.com/pages/111\n"
         "FAQ Facturation — https://confluence.veternity.com/pages/112",
         0.82,
