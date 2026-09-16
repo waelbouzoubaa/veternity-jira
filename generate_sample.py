@@ -49,5 +49,13 @@ ws.append(HEADERS)
 for row in rows:
     ws.append(row)
 
+# Duplique le jeu de base avec des clés/dates différentes pour tester la pagination (>1 page)
+for batch in range(1, 20):
+    for row in rows:
+        r = list(row)
+        r[0] = f"{r[0]}-B{batch}"
+        r[1] = r[1] + f"-B{batch}"
+        ws.append(r)
+
 wb.save("tickets_enrichis.xlsx")
-print("tickets_enrichis.xlsx généré avec", len(rows), "tickets de test")
+print("tickets_enrichis.xlsx généré avec", ws.max_row - 1, "tickets de test")
