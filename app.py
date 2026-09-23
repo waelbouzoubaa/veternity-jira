@@ -1,6 +1,7 @@
 import html
 import os
 import re
+import unicodedata
 
 import pandas as pd
 import streamlit as st
@@ -76,6 +77,21 @@ def strip_formatting(text: str) -> str:
     return html.escape(text)
 
 
+def _normalize_col(s: str) -> str:
+    s = unicodedata.normalize("NFKD", str(s)).encode("ascii", "ignore").decode("ascii")
+    return re.sub(r"\s+", " ", s).strip().lower()
+
+
+def find_column(df: pd.DataFrame, target: str):
+    """Retrouve la colonne correspondant à `target` même si le Sheet a une
+    orthographe légèrement différente (accents, espaces, majuscules)."""
+    target_norm = _normalize_col(target)
+    for col in df.columns:
+        if _normalize_col(col) == target_norm:
+            return col
+    return None
+
+
 def score_badge(score: float) -> str:
     if score >= 0.7:
         bg = "#2e7d32"
@@ -132,9 +148,19 @@ if df.empty:
 
 df["Score de pertinence"] = df["Score de pertinence"].apply(parse_score)
 
-COMMENT_COL = "Commentaires équipe support"
-if COMMENT_COL not in df.columns:
+with st.expander("🔧 Diagnostic colonnes (colonnes détectées dans la source)"):
+    st.write(list(df.columns))
+
+_comment_col_found = find_column(df, "Commentaires équipe support")
+if _comment_col_found is None:
+    COMMENT_COL = "Commentaires équipe support"
     df[COMMENT_COL] = ""
+    st.warning(
+        "⚠️ Colonne 'Commentaires équipe support' introuvable dans la source — "
+        "vérifie l'intitulé exact dans le diagnostic ci-dessus."
+    )
+else:
+    COMMENT_COL = _comment_col_found
 
 # --- Filtres ---
 c1, c2, c3, c4 = st.columns([2, 2, 3, 2])
