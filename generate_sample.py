@@ -3,6 +3,7 @@ from openpyxl import Workbook
 HEADERS = [
     "Ticket", "Lien Jira", "Titre", "Statut", "Date de création",
     "Date d'enrichissement", "Résumé RAG", "Ressources trouvées", "Score de pertinence",
+    "Commentaires équipe support",
 ]
 
 rows = [
@@ -18,6 +19,7 @@ rows = [
         "Procédure de connexion module facturation — https://confluence.veternity.com/pages/111\n"
         "FAQ Facturation — https://confluence.veternity.com/pages/112",
         0.82,
+        "Réponse correcte mais un peu longue, l'utilisateur a résolu son problème.",
     ],
     [
         "IC-102", "https://veternity.atlassian.net/browse/IC-102",
@@ -26,6 +28,7 @@ rows = [
         "Aucun document pertinent n'a été trouvé pour ce sujet précis.",
         "Aucune ressource pertinente trouvée",
         0.31,
+        "",
     ],
     [
         "IC-103", "https://veternity.atlassian.net/browse/IC-103",
@@ -34,6 +37,7 @@ rows = [
         "La procédure de création d'utilisateur est documentée avec les rôles disponibles.",
         "Gestion des utilisateurs — https://confluence.veternity.com/pages/120",
         0.91,
+        "",
     ],
     [
         "IC-104", "https://veternity.atlassian.net/browse/IC-104",
@@ -42,6 +46,7 @@ rows = [
         "Quelques pistes de dépannage existent mais ne couvrent pas ce code d'erreur précis.",
         "Dépannage intégration Salesforce — https://confluence.veternity.com/pages/130",
         0.58,
+        "Réponse hors-sujet, le score était pourtant élevé — à vérifier.",
     ],
 ]
 

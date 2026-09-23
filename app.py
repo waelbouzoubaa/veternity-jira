@@ -4,6 +4,9 @@ import re
 
 import pandas as pd
 import streamlit as st
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # "google_sheets" (prod / test VPS, portable) ou "excel" (test local rapide, voir generate_sample.py)
 DATA_SOURCE = os.getenv("DATA_SOURCE", "excel")
@@ -129,14 +132,20 @@ if df.empty:
 
 df["Score de pertinence"] = df["Score de pertinence"].apply(parse_score)
 
+COMMENT_COL = "Commentaires équipe support"
+if COMMENT_COL not in df.columns:
+    df[COMMENT_COL] = ""
+
 # --- Filtres ---
-c1, c2, c3 = st.columns(3)
+c1, c2, c3, c4 = st.columns([2, 2, 3, 2])
 with c1:
     statuts = st.multiselect("Statut", sorted(df["Statut"].dropna().unique()))
 with c2:
     score_min = st.slider("Score minimum", 0.0, 1.0, 0.0, 0.05)
 with c3:
     search = st.text_input("Recherche (ticket, titre)")
+with c4:
+    only_commented = st.checkbox("💬 Avec commentaire support")
 
 filtered = df.copy()
 if statuts:
@@ -148,6 +157,8 @@ if search:
         | filtered["Titre"].astype(str).str.contains(search, case=False, na=False)
     )
     filtered = filtered[mask]
+if only_commented:
+    filtered = filtered[filtered[COMMENT_COL].apply(lambda v: not pd.isna(v) and str(v).strip() != "")]
 
 filtered = filtered.sort_values("Date de création", ascending=False)
 
@@ -237,6 +248,16 @@ for _, row in page_df.iterrows():
 
         if row.get("Lien Jira"):
             st.link_button("🔗 Ouvrir le ticket Jira", row["Lien Jira"])
+
+        comment_val = row.get(COMMENT_COL)
+        comment = "" if pd.isna(comment_val) else str(comment_val).strip()
+        if comment:
+            st.markdown(
+                f"<div style='background:#fff3cd;border-left:4px solid #b8860b;"
+                f"padding:8px 12px;border-radius:4px;margin-top:10px;color:#3f3f3e;'>"
+                f"💬 <b>Commentaire équipe support :</b> {html.escape(comment)}</div>",
+                unsafe_allow_html=True,
+            )
 
         st.markdown("<div style='margin-top:14px;'></div>", unsafe_allow_html=True)
 
